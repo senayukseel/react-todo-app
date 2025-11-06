@@ -9,7 +9,7 @@ const App = () => {
     const saved = localStorage.getItem("todos");
     return saved ? JSON.parse(saved) : [];
   });
-  useEffect(()=> {
+  useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos));
   }, [todos]);
 
@@ -35,17 +35,28 @@ const App = () => {
   };
   const filterTodos = useMemo(() => {
     return todos.filter((todo) => {
-      if(filter === "active") return !todo.completed;
-      if(filter === "completed") return todo.completed;
+      if (filter === "active") return !todo.completed;
+      if (filter === "completed") return todo.completed;
       return true;
     });
   }, [todos, filter]);
-  const activeCount = useMemo(() =>
-    todos.filter((todo) => !todo.completed).length, [todos]
+  const activeCount = useMemo(
+    () => todos.filter((todo) => !todo.completed).length,
+    [todos]
   );
   const clearCompleted = () => {
-    setTodos((prev) => prev.filter((todo) => !todo.completed));
+    if (filter === "active") {
+      setTodos((prev) => prev.filter((todo) => todo.completed));
+    } else if (filter === "completed") {
+      setTodos((prev) => prev.filter((todo) => !todo.completed));
+    } else {
+      setTodos([]);
+    }
   };
+  const completedCount = useMemo(
+    () => todos.filter((todo) => todo.completed).length,
+    [todos]
+  );
 
   return (
     <section
@@ -74,13 +85,13 @@ const App = () => {
                 className="text-3xl font-semibold sm:text-5xl 
               text-purple-600 dark:text-purple-400"
               >
-                My Tasks
+              Task Flow
               </h1>
               <p
                 className="text-sm sm:text-base mt-1 text-gray-600
               dark:text-gray-400 transition-colors"
               >
-                Stay organized, stay productive.
+                No Cap, Just Get It Done!
               </p>
             </div>
           </div>
@@ -165,8 +176,10 @@ const App = () => {
                   </p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-200/60 dark:divide-gray-200/20 max-h-96
-                overflow-y-auto">
+                <div
+                  className="divide-y divide-gray-200/60 dark:divide-gray-200/20 max-h-96
+                overflow-y-auto"
+                >
                   {filterTodos.map((todo) => (
                     <div
                       className="flex items-center justify-between p-4 group"
@@ -211,23 +224,41 @@ const App = () => {
               )}
             </div>
 
-          {filterTodos.length > 0 && (
-            <div className="flex items-center justify-between py-4 px-5">
-              <p className="text-sm font-medium text-gray-600 dark:text-gray-200
-              transition-colors">
-              ({activeCount}) {activeCount === 1 ? "item" : "items"} left
-              </p>
-              {todos.some((todo) => todo.completed) && (
-                <button className="text-red-600 hover:text-red-700 
+            {filterTodos.length > 0 && (
+              <div className="flex items-center justify-between py-4 px-5">
+                <p
+                  className="text-sm font-medium text-gray-600 dark:text-gray-200
+              transition-colors"
+                >
+                  {filter === "completed" ? (
+                    <>
+                      ({completedCount}){" "}
+                      {completedCount === 1 ? "item" : "items"} completed
+                    </>
+                  ) : (
+                    <>
+                      ({activeCount}) {activeCount === 1 ? "item" : "items"}{" "}
+                      left
+                    </>
+                  )}
+                </p>
+                {todos.length > 0 && (
+                  <button
+                    className="text-red-600 hover:text-red-700 
                 focus:text-red-700 dark:text-red-400 hover:bg-red-100
                 dark:hover:bg-red-900 dark:focus:bg-red-900
-                transition-colors px-4 rounded-xl py-2" onClick={clearCompleted}>
-                  clear completed
-                </button>
-              )}
-            </div>
-          )}
-
+                transition-colors px-4 rounded-xl py-2"
+                    onClick={clearCompleted}
+                  >
+                    {filter === "active"
+                      ? "Clear Active"
+                      : filter === "completed"
+                      ? "Clear Completed"
+                      : "Clear All"}
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </main>
