@@ -44,7 +44,11 @@ npm run dev
 - `vite.config.js` – Vite + React plugin config (support for JSX fast refresh and Tailwind 4).
 
 ## What I Learned
-1. **Hook composition** – using `useMemo` to derive `activeCount`/`completedCount` keeps renders predictable.
+1. **Hook composition** – using `use
+
+https://github.com/user-attachments/assets/cd3372b2-e35d-4092-8250-8e84e762c2bd
+
+Memo` to derive `activeCount`/`completedCount` keeps renders predictable.
 2. **Derived UI states** – conditional rendering of edit buttons based on `filter` taught me how to keep UX rules inside React, not CSS hacks.
 3. **Local persistence** – wrapping `localStorage` reads in a lazy `useState` initializer prevents hydration mismatches.
 
