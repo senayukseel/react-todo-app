@@ -1,5 +1,5 @@
 import ToggleTheme from "./components/ToggleTheme";
-import { Sparkles, Plus, Check, Trash2, Circle, Pencil, X } from "lucide-react";
+import { Plus,  CalendarCheck2, Check, Trash2, Circle, Pencil, X } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
 const App = () => {
@@ -99,7 +99,7 @@ const App = () => {
 
   return (
     <section
-      className="min-h-screen bg-gray-50 text-gray-900
+      className="min-h-screen  bg-gray-50 text-gray-900
     dark:text-gray-50 dark:bg-gray-900 transition-colors flex
     flex-col"
     >
@@ -116,7 +116,7 @@ const App = () => {
             justify-center text-white rounded-2xl transition-colors shrink-0
             dark:bg-purple-400"
             >
-              <Sparkles />
+              < CalendarCheck2 />
             </span>
 
             <div>
@@ -147,7 +147,7 @@ const App = () => {
           items-center gap-2 p-2 justify-between transition-colors"
           >
             <input
-              type="text"
+              type="text-lg"
               value={input}
               onKeyDown={(e) => e.key === "Enter" && addTodo()}
               onChange={(e) => setInput(e.target.value)}
