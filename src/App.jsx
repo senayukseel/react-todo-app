@@ -1,5 +1,5 @@
 import ToggleTheme from "./components/ToggleTheme";
-import { Sparkles, Plus, Check, Trash2, Circle } from "lucide-react";
+import { Sparkles, Plus, Check, Trash2, Circle, Pencil, X } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 
 const App = () => {
@@ -14,6 +14,8 @@ const App = () => {
   }, [todos]);
 
   const [filter, setFilter] = useState("all");
+  const [editingId, setEditingId] = useState(null);
+  const [editInput, setEditInput] = useState("");
   const addTodo = () => {
     if (input.trim()) {
       setTodos((prev) => [
@@ -32,6 +34,10 @@ const App = () => {
         todo.id === id ? { ...todo, completed: !todo.completed } : todo
       )
     );
+    if (editingId === id) {
+      setEditingId(null);
+      setEditInput("");
+    }
   };
   const filterTodos = useMemo(() => {
     return todos.filter((todo) => {
@@ -51,6 +57,39 @@ const App = () => {
       setTodos((prev) => prev.filter((todo) => !todo.completed));
     } else {
       setTodos([]);
+    }
+  };
+  const startEditing = (todo) => {
+    if (todo.completed) return;
+    setEditingId(todo.id);
+    setEditInput(todo.text);
+  };
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditInput("");
+  };
+  const saveEditing = () => {
+    if (!editingId) return;
+    const trimmed = editInput.trim();
+    if (!trimmed) {
+      cancelEditing();
+      return;
+    }
+    setTodos((prev) =>
+      prev.map((todo) =>
+        todo.id === editingId ? { ...todo, text: trimmed } : todo
+      )
+    );
+    cancelEditing();
+  };
+  const handleEditKeyDown = (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      saveEditing();
+    }
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelEditing();
     }
   };
   const completedCount = useMemo(
@@ -180,46 +219,92 @@ const App = () => {
                   className="divide-y divide-gray-200/60 dark:divide-gray-200/20 max-h-96
                 overflow-y-auto"
                 >
-                  {filterTodos.map((todo) => (
-                    <div
-                      className="flex items-center justify-between p-4 group"
-                      key={todo.id}
-                    >
-                      <div className="flex items-center gap-3.5">
-                        <button
-                          className={`size-6 border rounded-full flex items-center justify-center
+                  {filterTodos.map((todo) => {
+                    const isEditing = editingId === todo.id;
+
+                    return (
+                      <div
+                        className="flex items-center justify-between p-4 group"
+                        key={todo.id}
+                      >
+                        <div className="flex items-center gap-3.5 flex-1">
+                          <button
+                            className={`size-6 border rounded-full flex items-center justify-center
                             ${
                               todo.completed
                                 ? "bg-purple-500 dark:bg-purple-600 border-purple-500 dark:border-purple-600"
                                 : "border-gray-300 hover:border-purple-600 dark:border-gray-600 dark:hover:border-purple-400"
                             }`}
-                          onClick={() => toggleTodo(todo.id)}
-                        >
-                          {todo.completed && (
-                            <Check size={16} className="text-white" />
+                            onClick={() => toggleTodo(todo.id)}
+                          >
+                            {todo.completed && (
+                              <Check size={16} className="text-white" />
+                            )}
+                          </button>
+                          {isEditing ? (
+                            <input
+                              value={editInput}
+                              onChange={(event) => setEditInput(event.target.value)}
+                              onKeyDown={handleEditKeyDown}
+                              autoFocus
+                              className="flex-1 bg-transparent border border-purple-400/60 dark:border-purple-500/60 rounded-lg px-3 py-1 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                            />
+                          ) : (
+                            <p
+                              className={`transition ${
+                                todo.completed
+                                  ? "line-through text-gray-400 dark:text-gray-500"
+                                  : "text-gray-800 dark:text-gray-100"
+                              }`}
+                            >
+                              {todo.text}
+                            </p>
                           )}
-                        </button>
-                        <p
-                          className={`transition ${
-                            todo.completed
-                              ? "line-through text-gray-400 dark:text-gray-500"
-                              : "text-gray-800 dark:text-gray-100"
+                        </div>
+                        <div
+                          className={`flex items-center gap-2 transition-all ${
+                            isEditing
+                              ? ""
+                              : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
                           }`}
                         >
-                          {todo.text}
-                        </p>
-                      </div>
-                      <button
-                        className="size-8 flex items-center justify-center 
+                          {!todo.completed && !isEditing && (
+                            <button
+                              className="size-8 flex items-center justify-center bg-blue-100 hover:bg-blue-200 text-blue-600 rounded-xl dark:bg-blue-900 dark:text-blue-400 dark:hover:bg-blue-800"
+                              onClick={() => startEditing(todo)}
+                            >
+                              <Pencil size={16} />
+                            </button>
+                          )}
+                          {!todo.completed && isEditing && (
+                            <div className="flex items-center gap-1 ml-2">
+                              <button
+                                className="size-8 flex items-center justify-center bg-green-100 hover:bg-green-200 text-green-600 rounded-xl dark:bg-green-900 dark:text-green-400 dark:hover:bg-green-800 disabled:opacity-50"
+                                onClick={saveEditing}
+                                disabled={!editInput.trim()}
+                              >
+                                <Check size={16} />
+                              </button>
+                              <button
+                                className="size-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-xl dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                                onClick={cancelEditing}
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          )}
+                          <button
+                            className="size-8 flex items-center justify-center 
             bg-red-100 hover:bg-red-200 text-red-600 rounded-xl dark:bg-red-900
-            dark:text-red-400 dark:hover:bg-red-800 opacity-0 invisible 
-            group-hover:opacity-100 group-hover:visible transition-all"
-                        onClick={() => deleteTodo(todo.id)}
-                      >
-                        <Trash2 />
-                      </button>
-                    </div>
-                  ))}
+            dark:text-red-400 dark:hover:bg-red-800 transition-all"
+                            onClick={() => deleteTodo(todo.id)}
+                          >
+                            <Trash2 />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
