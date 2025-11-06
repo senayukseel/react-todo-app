@@ -1,6 +1,4 @@
-# Task Flow – Junior-Friendly React Todo App
-
-I’m a curious junior computer engineer and this project is where I practice modern React patterns without getting overwhelmed. Task Flow lets me polish core skills (state, hooks, component composition) while shipping something useful: a sleek todo manager with light/dark themes and smooth micro-interactions.
+# Task Flow – React Todo App
 
 ## Features I Built While Learning
 - **Smart filters** – switch between `All`, `Active`, and `Completed` lists with instant feedback.
